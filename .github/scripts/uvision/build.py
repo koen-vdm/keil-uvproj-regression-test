@@ -1,8 +1,8 @@
-"""Checks Keil uVision build output log files."""
 # ####################################################################################
-# @file uvision-check.py
+# @file uvision-build.py
 #
-# @brief checks Keil uVision build output log files.
+# @brief builds projects in repository using ARM Keil uVision 5. This will only work
+# on a Windows machine that has Keil uVision 5 installed.
 #
 # Copyright (c) 2023 Dialog Semiconductor. All rights reserved.
 #
@@ -24,3 +24,38 @@
 # ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THE SOFTWARE.
 #
 # #####################################################################################
+
+"""Builds projects in repository using ARM Keil uVision 5."""
+
+import argparse
+import subprocess
+
+from common import findProjectFiles
+
+parser = argparse.ArgumentParser(
+    prog="uVisionBuild",
+    description="builds projects in repository using ARM Keil uVision 5.",
+    epilog="Due to the dependency to Keil uVision 5 this script will only \
+                              work on a Windows machine that has Keil uVision 5 installed. \
+                              please be aware of the Keil license agreement before using this \
+                              script. The build also depends on the DA145xx SDK6. The project \
+                              must either be cloned inside the 'projects' folder of the SDK  \
+                              or the projects must be linked using dlg_make_keil5_env_v2.000.py",
+)
+parser.add_argument(
+    "-d",
+    "--dir",
+    default=".",
+    help="The directory to search project files. \
+                    default='.'",
+)
+args = parser.parse_args()
+
+# get list of examples
+projects = findProjectFiles(args.dir)
+
+# projects = projects[0:3] # only build first few examples for debugging purposes
+
+for p in projects:
+    print("building " + p.title)
+    subprocess.call(["C:/Keil_v5/UV4/UV4.exe", "-b", p.path, "-z", "-o", p.logfile])
