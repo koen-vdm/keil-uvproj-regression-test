@@ -72,11 +72,12 @@ projects = findProjectFiles(args.dir)
 
 for t in targets:
     for p in projects:
-        with open(p.basedir + "\\" + p.logfile) as f:
-            if (t.acronym + passmarker) in f.read():
-                t.passed.append(p)
-            else:
-                t.failed.append(p)
+        with open(p.basedir + "\\" + p.logfile) as log, open(p.path) as proj:
+            if ("<TargetName>" + t.name + "</TargetName>") in proj.read():
+                if (t.acronym + passmarker) in log.read():
+                    t.passed.append(p)
+                else:
+                    t.failed.append(p)
 
 # print output
 for t in targets:
