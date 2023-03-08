@@ -30,7 +30,7 @@
 import argparse
 import subprocess
 
-from common import findProjectFiles
+from common import bcolors, findProjectFiles
 
 parser = argparse.ArgumentParser(
     prog="uVisionBuild",
@@ -57,5 +57,11 @@ projects = findProjectFiles(args.dir)
 # projects = projects[0:3] # only build first few examples for debugging purposes
 
 for p in projects:
-    print("building " + p.title)
-    subprocess.call(["C:/Keil_v5/UV4/UV4.exe", "-b", p.path, "-z", "-o", p.logfile])
+    print(bcolors.OKBLUE + "building " + p.title + "..." + bcolors.ENDC)
+    returncode = subprocess.call(
+        ["C:/Keil_v5/UV4/UV4.exe", "-b", p.path, "-z", "-o", p.logfile]
+    )
+    # Keil returns 0 if build is ok, 1 if there are warnings, and 2-20 if there are errors
+    colors = [bcolors.OKGREEN, bcolors.WARNING] + [bcolors.FAIL] * 18
+    with open(p.basedir + p.logfile, "r") as f:
+        print(colors[returncode] + f.read() + bcolors.ENDC)
